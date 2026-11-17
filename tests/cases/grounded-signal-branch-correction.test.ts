@@ -3,7 +3,8 @@ import type { CircuitJson } from "circuit-json"
 import { analyzeSchematicPlacement } from "lib/index"
 import { createGroundedSignalBranch } from "../assets/grounded-signal-branch"
 import { createQuadSensorConditioner } from "../assets/quad-sensor-conditioner"
-import { createPlacementComparisonSvg } from "../fixtures/create-placement-comparison-svg"
+import { stackSvgsVertically } from "stack-svgs"
+import { createSchematicAnalysisFixtureSvg } from "../fixtures/create-schematic-analysis-fixture-svg"
 import { createSectionedSchematicSnapshot } from "../fixtures/create-sectioned-schematic-snapshot"
 import {
   electricalPinSignature,
@@ -42,7 +43,7 @@ const fixedSymbols = (j: CircuitJson) => {
       }),
   ]
 }
-test("turns ground pins downward without changing circuit topology or fixed symbols", async () => {
+test("accepts either ground direction and preserves topology when aligning the full-board capacitor connectors", async () => {
   for (const full of [false, true]) {
     const build = full
       ? createQuadSensorConditioner
@@ -56,30 +57,26 @@ test("turns ground pins downward without changing circuit topology or fixed symb
     expect(fixedSymbols(after)).toEqual(fixedSymbols(before))
     const analysis = analyzeSchematicPlacement(before),
       corrected = analyzeSchematicPlacement(after)
-    expect(analysis.getIssues()).toHaveLength(full ? 12 : 1)
+    expect(analysis.getIssues()).toHaveLength(full ? 4 : 0)
     expect(corrected.getIssues()).toEqual([])
     if (full)
       for (let n = 1; n <= 4; n++)
         expectVisibleConnection(after, `JP${n}`, "pin1", `C2${n}`, "pin2")
     if (!full) {
       expect(
-        createPlacementComparisonSvg({
-          subject: "sensor output filter",
-          before: { circuitJson: before, analysis },
-          after: { circuitJson: after, analysis: corrected },
-          issues: analysis.getIssues(),
-          centerEachPanel: true,
-          panelHeight: 600,
-          backgroundColor: "#f5f1ed",
-          contextSourceComponentIds: before.flatMap((e) =>
-            e.type === "source_component" ? [e.source_component_id] : [],
-          ),
-          beforeDiagnostic: () =>
-            "C31: ground pin points above the signal branch.",
-          afterDiagnostic:
-            "Ground below the signal; original pins and values preserved.\nComplete 3-component extract: 0 reported issues.",
-          note: "Output filter from quad-sensor-conditioner v1.0.1. The full board has eight equivalent grounded capacitors.",
-        }),
+        stackSvgsVertically(
+          [
+            createSchematicAnalysisFixtureSvg({
+              circuitJson: before,
+              analysis,
+            }),
+            createSchematicAnalysisFixtureSvg({
+              circuitJson: after,
+              analysis: corrected,
+            }),
+          ],
+          { normalizeSize: false, gap: 0 },
+        ),
       ).toMatchSvgSnapshot(import.meta.path, "comparison")
     } else {
       expect(

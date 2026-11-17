@@ -37,8 +37,8 @@ test("moving only D2 and D5 beside one another preserves the complete power shee
   const previousMessages = existing.map((i) =>
     analysis.schematicIssuesToString(i),
   )
-  // D7's crossed branches and inverted rails remain after moving D2 and D5.
-  expect(analysis.getIssues()).toHaveLength(7)
+  // D7's crossed branches remain after moving D2 and D5.
+  expect(analysis.getIssues()).toHaveLength(6)
   for (const issue of analysis.getIssues())
     expect(previousMessages).toContain(analysis.schematicIssuesToString(issue))
   const changed = after.filter(

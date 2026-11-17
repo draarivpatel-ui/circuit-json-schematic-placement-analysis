@@ -11,34 +11,18 @@ import {
 
 // Unchanged source/schematic elements for R_PD_SDA and R_PD_SCL from the
 // pd-power-supply-0.3mm Circuit JSON, including their shared rail below them.
-test("captures the PD I2C pull-up rail below both resistors and verifies the 180 degree correction", async () => {
+test("accepts both vertical directions for PD I2C pull-ups without changing connectivity", async () => {
   const before = original as unknown as CircuitJson
   const serialized = JSON.stringify(before)
   const issueTypes = ["TwoPinComponentHasInvertedRails"] as const
   const analysis = analyzeSchematicPlacement(before, { issueTypes })
   const issues = analysis.getIssues()
-  expect(issues).toHaveLength(2)
-  expect(issues).toMatchObject(
-    ["R_PD_SDA", "R_PD_SCL"].map((name) => ({
-      lineItemType: "TwoPinComponentHasInvertedRails",
-      schematicBox: { sourceComponentName: name },
-      railSourcePortId: getReproSourcePort(before, name, "pin2").source_port_id,
-      railPinName: "pin2",
-      railType: "power",
-      deltaSchRotation: 180,
-      suggestedRailFacingDirection: "up",
-    })),
-  )
+  expect(issues).toEqual([])
   expect(analyzeSchematicPlacement(before).getIssues({ issueTypes })).toEqual(
     issues,
   )
   const renderedBefore = await createPdI2cPullUpsCircuitJson()
-  const first = issues[0]!
-  if (first.lineItemType !== "TwoPinComponentHasInvertedRails")
-    throw new Error("Expected inverted pull-up rail")
-  const after = await createPdI2cPullUpsCircuitJson(
-    270 + first.deltaSchRotation,
-  )
+  const after = await createPdI2cPullUpsCircuitJson(90)
   expect(
     after.filter(
       (e) => e.type.startsWith("source_") && !e.type.endsWith("_warning"),

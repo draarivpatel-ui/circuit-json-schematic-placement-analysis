@@ -49,7 +49,7 @@ test("corrects rcr-junction with unchanged electrical connections and original s
         e.type === "source_component" ? [e.source_component_id] : [],
       ),
       beforeDiagnostic: () =>
-        "R32 / R35 / C22: shared junction spread across separate blocks.\nThe original also has an existing inverted-ground warning.",
+        "R32 / R35 / C22: shared junction spread across separate blocks.",
       afterDiagnostic:
         "The three-way junction is grouped, with ground below C22.\nComplete extract: 0 reported issues.",
       note: "Complete 3-component extract. Values and pin connections preserved. Original board context is retained in the repro snapshot.",

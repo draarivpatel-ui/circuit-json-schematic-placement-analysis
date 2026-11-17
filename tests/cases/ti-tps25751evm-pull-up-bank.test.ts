@@ -8,7 +8,7 @@ import {
   getReproSourcePort,
 } from "../fixtures/placement-repro-assertions"
 
-test("reproduces false inverted-rail warnings for the TI TPS25751EVM pull-up bank", async () => {
+test("accepts the TI TPS25751EVM pull-up bank with supply below the signals", async () => {
   const circuitJson = await createTiTps25751EvmPullUpBank()
   expectReproRendered(circuitJson, 6)
   expectReproNets(circuitJson, [
@@ -47,13 +47,7 @@ test("reproduces false inverted-rail warnings for the TI TPS25751EVM pull-up ban
     expect(supplyPort.center.y).toBeLessThan(signalPort.center.y)
   }
   const analysis = analyzeSchematicPlacement(circuitJson)
-  expect(analysis.getIssues()).toMatchObject(
-    ["R13", "R14", "R15", "R16", "R17", "R18"].map((name) => ({
-      lineItemType: "TwoPinComponentHasInvertedRails",
-      schematicBox: { sourceComponentName: name },
-      railType: "power",
-    })),
-  )
+  expect(analysis.getIssues()).toEqual([])
   expect(
     createSchematicAnalysisFixtureSvg({
       circuitJson,
