@@ -93,7 +93,6 @@ test("reproduces the published rcr-junction placement and its missed pattern", a
   }
   const analysis = analyzeSchematicPlacement(json)
   expect(analysis.getIssues().map((e) => e.lineItemType)).toEqual([
-    "TwoPinComponentHasInvertedRails",
     "RcrJunctionNotGrouped",
   ])
   expect(

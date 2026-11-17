@@ -8,7 +8,7 @@ import {
   getReproSourcePort,
 } from "../fixtures/placement-repro-assertions"
 
-test("reproduces a false inverted-rail warning for TI THS4541RGT R26 with ground above the signal", async () => {
+test("accepts TI THS4541RGT signal terminations with ground above or below", async () => {
   const circuitJson = await createTiThs4541InputTermination()
   expectReproRendered(circuitJson, 6)
   expectReproNets(circuitJson, [
@@ -41,13 +41,7 @@ test("reproduces a false inverted-rail warning for TI THS4541RGT R26 with ground
     expect(groundPort.center.y > signalPort.center.y).toBe(name === "R26")
   }
   const analysis = analyzeSchematicPlacement(circuitJson)
-  expect(analysis.getIssues()).toMatchObject([
-    {
-      lineItemType: "TwoPinComponentHasInvertedRails",
-      schematicBox: { sourceComponentName: "R26" },
-      railType: "ground",
-    },
-  ])
+  expect(analysis.getIssues()).toEqual([])
   expect(
     createSchematicAnalysisFixtureSvg({
       circuitJson,

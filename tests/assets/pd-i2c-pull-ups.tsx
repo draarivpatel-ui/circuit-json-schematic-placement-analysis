@@ -1,7 +1,7 @@
 import { Circuit } from "@tscircuit/core"
 import { Fragment } from "react"
 
-// Re-render the screenshot's two 4.7k pull-ups with the recommended rotations.
+// Re-render the screenshot's two 4.7k pull-ups in either vertical direction.
 // pin1 stays on its I2C signal; pin2 stays on the shared positive supply.
 export async function createPdI2cPullUpsCircuitJson(
   rotation = 270,

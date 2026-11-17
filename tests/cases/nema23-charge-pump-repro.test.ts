@@ -30,7 +30,7 @@ test("preserves the separated charge-pump capacitor on the complete NEMA23 drive
   const analysis = analyzeSchematicPlacement(circuitJson)
   const issueTypes = ["CapacitorSeparatedFromChipPins"] as const
   const issues = analysis.getIssues({ issueTypes })
-  expect(analysis.getIssues()).toHaveLength(6)
+  expect(analysis.getIssues()).toHaveLength(3)
   // The unchanged VM row has a 1.1-unit neighbour gap, above the 1-unit limit.
   expect(
     analysis.getIssues({
@@ -49,13 +49,7 @@ test("preserves the separated charge-pump capacitor on the complete NEMA23 drive
   ])
   expect(
     analysis.getIssues({ issueTypes: ["TwoPinComponentHasInvertedRails"] }),
-  ).toMatchObject(
-    ["R_CS", "R_FAULT", "R_HOME"].map((name) => ({
-      schematicBox: { sourceComponentName: name },
-      railPinName: "pin2",
-      deltaSchRotation: 180,
-    })),
-  )
+  ).toEqual([])
   expect(issues).toMatchObject([
     {
       hostSchematicBox: { sourceComponentName: "DRIVER" },

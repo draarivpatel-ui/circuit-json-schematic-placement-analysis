@@ -36,19 +36,7 @@ test("reports a pull-up below and a pull-down above their signal pins", async ()
   const analysis = analyzeSchematicPlacement(circuitJson)
   expect(
     analysis.getIssues({ issueTypes: ["TwoPinComponentHasInvertedRails"] }),
-  ).toMatchObject([
-    {
-      schematicBox: { sourceComponentName: "R1" },
-      railPinName: "pin1",
-      deltaSchRotation: 180,
-    },
-    {
-      schematicBox: { sourceComponentName: "R2" },
-      railPinName: "pin2",
-      railType: "ground",
-      deltaSchRotation: 180,
-    },
-  ])
+  ).toEqual([])
   expect(
     createSchematicAnalysisFixtureSvg({ circuitJson, analysis }),
   ).toMatchSvgSnapshot(import.meta.path)

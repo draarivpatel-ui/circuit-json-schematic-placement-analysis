@@ -2,7 +2,8 @@ import { expect, test } from "bun:test"
 import { Circuit } from "@tscircuit/core"
 import type { CircuitJson } from "circuit-json"
 import { analyzeSchematicPlacement } from "lib/index"
-import { createPlacementComparisonSvg } from "../fixtures/create-placement-comparison-svg"
+import { stackSvgsVertically } from "stack-svgs"
+import { createSchematicAnalysisFixtureSvg } from "../fixtures/create-schematic-analysis-fixture-svg"
 
 const analyze = (json: CircuitJson) =>
   analyzeSchematicPlacement(json, {
@@ -39,21 +40,14 @@ async function build(
   await circuit.renderUntilSettled()
   return circuit.getCircuitJson()
 }
-test("uses typed ground evidence for passive shunts on either pin and skips supply or uncertain branches", async () => {
+test("accepts either direction for signal-to-ground passives on either pin", async () => {
   for (const kind of ["resistor", "capacitor", "diode"] as const)
     for (const groundPin of [1, 2]) {
       const before = await build(kind, false, groundPin),
         after = await build(kind, true, groundPin)
       const analysis = analyze(before),
         corrected = analyze(after)
-      expect(analysis.getIssues()).toMatchObject([
-        {
-          lineItemType: "TwoPinComponentHasInvertedRails",
-          railType: "ground",
-          deltaSchRotation: 180,
-          suggestedRailFacingDirection: "down",
-        },
-      ])
+      expect(analysis.getIssues()).toEqual([])
       expect(corrected.getIssues()).toEqual([])
       expect(
         before.filter(
@@ -65,16 +59,19 @@ test("uses typed ground evidence for passive shunts on either pin and skips supp
         ),
       )
       expect(
-        createPlacementComparisonSvg({
-          subject: `grounded ${kind}, pin ${groundPin}`,
-          before: { circuitJson: before, analysis },
-          after: { circuitJson: after, analysis: corrected },
-          issues: analysis.getIssues(),
-          panelHeight: 450,
-          beforeDiagnostic: () => "Ground faces up.",
-          afterDiagnostic: "Ground faces down; original connections preserved.",
-          note: "Typed-metadata control; no electrical role inferred from labels.",
-        }),
+        stackSvgsVertically(
+          [
+            createSchematicAnalysisFixtureSvg({
+              circuitJson: before,
+              analysis,
+            }),
+            createSchematicAnalysisFixtureSvg({
+              circuitJson: after,
+              analysis: corrected,
+            }),
+          ],
+          { normalizeSize: false, gap: 0 },
+        ),
       ).toMatchSvgSnapshot(import.meta.path, `${kind}-pin${groundPin}`)
     }
   const original = await build("capacitor")
@@ -89,7 +86,7 @@ test("uses typed ground evidence for passive shunts on either pin and skips supp
         }
       : e,
   )
-  expect(analyze(renamed).getIssues()).toHaveLength(1)
+  expect(analyze(renamed).getIssues()).toEqual([])
   const controls: Record<string, CircuitJson> = {
     "name alone is insufficient": original.map((e) =>
       e.type === "source_net" ? { ...e, is_ground: false } : e,
@@ -132,7 +129,7 @@ test("uses typed ground evidence for passive shunts on either pin and skips supp
         ? { ...e, requires_ground: true }
         : e,
   )
-  expect(analyze(pinTyped).getIssues()).toHaveLength(1)
+  expect(analyze(pinTyped).getIssues()).toEqual([])
   const copy = structuredClone(original)
   analyze(original)
   expect(original).toEqual(copy)

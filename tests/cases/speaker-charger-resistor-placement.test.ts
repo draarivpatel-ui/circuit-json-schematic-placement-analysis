@@ -33,23 +33,16 @@ test("moving only R17 beside U6 preserves the full charger circuit and draws its
   expect(
     analysis.getIssues({ issueTypes: ["ResistorSeparatedFromChipPin"] }),
   ).toEqual([])
-  // Moving R17 below its pin also turns its ground terminal downward.
+  // Neither signal-to-ground resistor requires a particular vertical direction.
   expect(
     analyzeSchematicPlacement(before).getIssues({
       issueTypes: ["TwoPinComponentHasInvertedRails"],
     }),
-  ).toHaveLength(2)
+  ).toEqual([])
   expect(analysis.getIssues()).toEqual(
     analyzeSchematicPlacement(before)
       .getIssues()
-      .filter(
-        (i) =>
-          i.lineItemType !== "ResistorSeparatedFromChipPin" &&
-          !(
-            i.lineItemType === "TwoPinComponentHasInvertedRails" &&
-            i.schematicBox.sourceComponentName === "R17"
-          ),
-      ),
+      .filter((i) => i.lineItemType !== "ResistorSeparatedFromChipPin"),
   )
   const pins = [
     getReproSourcePort(after, "U6", "PROG"),

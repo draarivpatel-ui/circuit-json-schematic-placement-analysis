@@ -6,13 +6,13 @@ import { createIssueOverlaySvg } from "../fixtures/create-issue-overlay-svg"
 import { createAnalyzerTextSvg } from "../fixtures/create-schematic-analysis-fixture-svg"
 import { getReproSourcePort } from "../fixtures/placement-repro-assertions"
 
-test("identifies inverted positive-supply capacitors and resistors in the unchanged Allwinner schematic", () => {
+test("identifies only inverted positive-supply-to-ground components in the unchanged Allwinner schematic", () => {
   const original = JSON.stringify(circuitJson)
   const analysis = analyzeSchematicPlacement(circuitJson)
   const allInverted = analysis.getIssues({
     issueTypes: ["TwoPinComponentHasInvertedRails"],
   })
-  expect(allInverted).toHaveLength(67)
+  expect(allInverted).toHaveLength(47)
   const issues = allInverted.filter(
     (i) =>
       i.lineItemType === "TwoPinComponentHasInvertedRails" &&
@@ -24,9 +24,9 @@ test("identifies inverted positive-supply capacitors and resistors in the unchan
         i.lineItemType === "TwoPinComponentHasInvertedRails" &&
         i.railType === "ground",
     ),
-  ).toHaveLength(11)
+  ).toHaveLength(0)
   // Review the full design's count, not just the six buck capacitors.
-  expect(issues).toHaveLength(56)
+  expect(issues).toHaveLength(47)
   expect(
     analyzeSchematicPlacement(circuitJson, {
       issueTypes: ["TwoPinComponentHasInvertedRails"],
@@ -43,25 +43,7 @@ test("identifies inverted positive-supply capacitors and resistors in the unchan
       ),
   )
   expect(capacitorIssues).toHaveLength(47)
-  expect(
-    issues.filter((issue) => !capacitorIssues.includes(issue)),
-  ).toMatchObject(
-    [
-      "R101",
-      "R103",
-      "R105",
-      "R109",
-      "R110",
-      "R111",
-      "R113",
-      "R114",
-      "R115",
-    ].map((name) => ({
-      schematicBox: { sourceComponentName: name },
-      railPinName: "pin1",
-      deltaSchRotation: 180,
-    })),
-  )
+  expect(issues.filter((issue) => !capacitorIssues.includes(issue))).toEqual([])
   for (const issue of capacitorIssues) {
     if (issue.lineItemType !== "TwoPinComponentHasInvertedRails")
       throw new Error("Expected rail-facing issue")

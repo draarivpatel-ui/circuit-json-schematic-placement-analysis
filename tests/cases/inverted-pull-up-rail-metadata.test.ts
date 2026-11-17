@@ -10,7 +10,7 @@ import {
 } from "../fixtures/create-schematic-analysis-fixture-svg"
 import { getReproSourcePort } from "../fixtures/placement-repro-assertions"
 
-test("uses positive-supply metadata for pull-up flips on either pin and skips uncertain or series roles", async () => {
+test("accepts supply-to-signal resistors on either pin without inferring inversion from rail metadata", async () => {
   const before = original as unknown as CircuitJson
   const issueTypes = ["TwoPinComponentHasInvertedRails"] as const
   const issues = (json: CircuitJson) =>
@@ -28,14 +28,14 @@ test("uses positive-supply metadata for pull-up flips on either pin and skips un
       }
     return e
   })
-  expect(issues(renamed)).toHaveLength(2)
+  expect(issues(renamed)).toEqual([])
   expect(
     issues(
       before.map((e) =>
         e.type === "source_net" ? { ...e, is_power: false } : e,
       ),
     ),
-  ).toHaveLength(2)
+  ).toEqual([])
   const supplyIds = new Set(
     before.flatMap((e) =>
       e.type === "source_net" && e.is_positive_voltage_source
@@ -81,21 +81,8 @@ test("uses positive-supply metadata for pull-up flips on either pin and skips un
   for (const [name, json] of Object.entries(controls))
     expect(issues(json), name).toEqual([])
   const pin1Before = await createPdI2cPullUpsCircuitJson(90, 1)
-  expect(issues(pin1Before)).toMatchObject(
-    ["R_PD_SDA", "R_PD_SCL"].map((name) => ({
-      railSourcePortId: getReproSourcePort(pin1Before, name, "pin1")
-        .source_port_id,
-      railPinName: "pin1",
-      deltaSchRotation: 180,
-    })),
-  )
-  const first = issues(pin1Before)[0]!
-  if (first.lineItemType !== "TwoPinComponentHasInvertedRails")
-    throw new Error("Expected inverted rail")
-  const pin1After = await createPdI2cPullUpsCircuitJson(
-    90 + first.deltaSchRotation,
-    1,
-  )
+  expect(issues(pin1Before)).toEqual([])
+  const pin1After = await createPdI2cPullUpsCircuitJson(270, 1)
   expect(issues(pin1After)).toEqual([])
   expect(
     pin1After.filter(

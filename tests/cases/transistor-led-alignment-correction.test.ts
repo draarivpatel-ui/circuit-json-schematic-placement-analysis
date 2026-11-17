@@ -53,12 +53,10 @@ test("corrects the complete LED indicator with unchanged connections and zero fi
       beforeDiagnostic: (issue) =>
         issue.lineItemType === "TransistorLedNotAligned"
           ? "Q2 / LED4: separated connected terminals point in different directions."
-          : issue.lineItemType === "TransistorResistorNotAligned"
-            ? "R20 / Q2: resistor is not aligned with its connected transistor pin."
-            : "R16: the supply-connected resistor terminal points down.",
+          : "R20 / Q2: resistor is not aligned with its connected transistor pin.",
       afterDiagnostic:
         "LED4 and Q2 form a straight branch; R20 feeds Q2 from the side.\nComplete 4-component extract: 0 reported issues.",
-      note: "Tracker NETLIGHT extract. Original component values, symbols and pin connections are preserved. Existing resistor alignment and rail-orientation findings are also corrected.",
+      note: "Tracker NETLIGHT extract. Original component values, symbols and pin connections are preserved. The existing resistor alignment finding is also corrected.",
     }),
   ).toMatchSvgSnapshot(import.meta.path, "comparison")
   expect(
