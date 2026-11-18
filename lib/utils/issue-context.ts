@@ -360,6 +360,7 @@ export const getRelevantPlacementsForIssues = ({
         for (const component of issue.feedbackComponents)
           addPlacement(component)
         break
+      case "FuseShouldUseSchematicSymbol":
       case "TwoPinComponentShouldBeVertical":
       case "TwoPinComponentHasInvertedRails":
         addPlacement(issue.schematicBox)

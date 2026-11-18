@@ -62,6 +62,7 @@ import { DiodeResistorAlignmentSolver } from "./solvers/DiodeResistorAlignmentSo
 import { FeedbackNetworkPlacementSolver } from "./solvers/FeedbackNetworkPlacementSolver/FeedbackNetworkPlacementSolver"
 import { PullResistorPlacementSolver } from "./solvers/PullResistorPlacementSolver/PullResistorPlacementSolver"
 import { TwoPinComponentRailOrientationSolver } from "./solvers/TwoPinComponentRailOrientationSolver/TwoPinComponentRailOrientationSolver"
+import { FuseSymbolSolver } from "./solvers/FuseSymbolSolver/FuseSymbolSolver"
 import { SchematicBoxInnerLabelCollisionSolver } from "./solvers/SchematicBoxInnerLabelCollisionSolver/SchematicBoxInnerLabelCollisionSolver"
 import { SchematicBoxOverlapSolver } from "./solvers/SchematicBoxOverlapSolver/SchematicBoxOverlapSolver"
 import { SchematicBoxTooWideSolver } from "./solvers/SchematicBoxTooWideSolver/SchematicBoxTooWideSolver"
@@ -132,6 +133,7 @@ export class SchematicPlacementAnalysis {
       ResistorTestPointNotAligned: 0,
       ResistorConnectorNotAligned: 0,
       FuseConnectorNotAligned: 0,
+      FuseShouldUseSchematicSymbol: 0,
       TransistorLedNotAligned: 0,
       TransistorResistorNotAligned: 0,
       PotentiometerHasIncorrectRailOrientation: 0,
@@ -243,6 +245,8 @@ export class SchematicPlacementAnalysis {
         return ResistorConnectorAlignmentSolver.issueToString(issue)
       case "FuseConnectorNotAligned":
         return FuseConnectorAlignmentSolver.issueToString(issue)
+      case "FuseShouldUseSchematicSymbol":
+        return FuseSymbolSolver.issueToString(issue)
       case "TransistorLedNotAligned":
         return TransistorLedAlignmentSolver.issueToString(issue)
       case "TransistorResistorNotAligned":

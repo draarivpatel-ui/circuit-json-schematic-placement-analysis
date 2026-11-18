@@ -142,6 +142,8 @@ export function renderIssueOverlay(input: {
       (input.issueIndex !== undefined && index !== input.issueIndex)
     )
       return []
+    const isWarning = "severity" in issue && issue.severity === "warning"
+    const markerColor = isWarning ? "#a16207" : "#b91c1c"
     const context = getRelevantPlacementsForIssues({
       issues: [issue],
       componentPlacements: placements,
@@ -173,7 +175,9 @@ export function renderIssueOverlay(input: {
         ? ` class="pin-label-collision-highlight" data-highlight-schematic-port-id="${escapeXml(label.schematicPortId)}" data-highlight-label="${escapeXml(label.text)}"`
         : ""
       const drawnBounds = label ? getPinLabelHighlightBounds(label) : bounds
-      const markup = `<rect${labelAttrs} x="${drawnBounds.left}" y="${drawnBounds.bottom}" width="${drawnBounds.right - drawnBounds.left}" height="${drawnBounds.top - drawnBounds.bottom}" fill="${isContext ? "none" : "#ef444433"}" stroke="${isContext ? "#2563eb" : "#dc2626"}" stroke-width="${isContext ? 0.35 : 0.5}" ${isContext ? 'stroke-dasharray="5 3"' : ""} vector-effect="non-scaling-stroke" />`
+      const fill = isWarning ? "#f59e0b33" : "#ef444433"
+      const stroke = isWarning ? markerColor : "#dc2626"
+      const markup = `<rect${labelAttrs} x="${drawnBounds.left}" y="${drawnBounds.bottom}" width="${drawnBounds.right - drawnBounds.left}" height="${drawnBounds.top - drawnBounds.bottom}" fill="${isContext ? "none" : fill}" stroke="${isContext ? "#2563eb" : stroke}" stroke-width="${isContext ? 0.35 : 0.5}" ${isContext ? 'stroke-dasharray="5 3"' : ""} vector-effect="non-scaling-stroke" />`
       geometry.push(markup)
     }
     for (const placement of context) rect(boxBounds(placement), true)
@@ -303,6 +307,7 @@ export function renderIssueOverlay(input: {
         index,
         points,
         title,
+        markerColor,
         geometry: `<title>${title}</title><g transform="matrix(${values.join(" ")})">${geometry.join("")}</g>`,
         issueType: issue.lineItemType,
       },
@@ -374,7 +379,7 @@ export function renderIssueOverlay(input: {
   const leaders: string[] = []
   const markers: string[] = []
   const markup = overlays.map(
-    ({ index, points, title, geometry, issueType }) => {
+    ({ index, points, title, geometry, issueType, markerColor }) => {
       for (const point of points) {
         const preferredCenter = {
           x: point.x,
@@ -383,10 +388,10 @@ export function renderIssueOverlay(input: {
         const center = placeMarker(preferredCenter)
         if (center.x !== preferredCenter.x || center.y !== preferredCenter.y)
           leaders.push(
-            `<line x1="${point.x}" y1="${point.y}" x2="${center.x}" y2="${center.y}" stroke="#b91c1c" stroke-width="0.5" />`,
+            `<line x1="${point.x}" y1="${point.y}" x2="${center.x}" y2="${center.y}" stroke="${markerColor}" stroke-width="0.5" />`,
           )
         markers.push(
-          `<g data-issue-number="${index + 1}" data-issue-type="${issueType}" transform="translate(${center.x} ${center.y}) scale(${markerScale})"><title>${title}</title><circle r="${ISSUE_MARKER_RADIUS}" fill="#b91c1c" /><text y="4" text-anchor="middle" fill="white" font-family="sans-serif" font-size="11">${index + 1}</text></g>`,
+          `<g data-issue-number="${index + 1}" data-issue-type="${issueType}" transform="translate(${center.x} ${center.y}) scale(${markerScale})"><title>${title}</title><circle r="${ISSUE_MARKER_RADIUS}" fill="${markerColor}" /><text y="4" text-anchor="middle" fill="white" font-family="sans-serif" font-size="11">${index + 1}</text></g>`,
         )
       }
       return input.showIssueGeometry === false

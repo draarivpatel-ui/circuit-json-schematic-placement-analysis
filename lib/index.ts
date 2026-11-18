@@ -11,6 +11,7 @@ export { InductorCapacitorGroupingSolver } from "./solvers/InductorCapacitorGrou
 export { ResistorTestPointAlignmentSolver } from "./solvers/ResistorTestPointAlignmentSolver/ResistorTestPointAlignmentSolver"
 export { ResistorConnectorAlignmentSolver } from "./solvers/ResistorConnectorAlignmentSolver/ResistorConnectorAlignmentSolver"
 export { FuseConnectorAlignmentSolver } from "./solvers/FuseConnectorAlignmentSolver/FuseConnectorAlignmentSolver"
+export { FuseSymbolSolver } from "./solvers/FuseSymbolSolver/FuseSymbolSolver"
 export { TransistorLedAlignmentSolver } from "./solvers/TransistorLedAlignmentSolver/TransistorLedAlignmentSolver"
 export { TransistorResistorAlignmentSolver } from "./solvers/TransistorResistorAlignmentSolver/TransistorResistorAlignmentSolver"
 export { PotentiometerRailOrientationSolver } from "./solvers/PotentiometerRailOrientationSolver/PotentiometerRailOrientationSolver"
