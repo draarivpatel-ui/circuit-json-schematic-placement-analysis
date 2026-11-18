@@ -8,6 +8,7 @@ export function createAnalyzerTextSvg(
   text: string,
   width: number,
   markers: readonly AnalyzerTextIssueMarker[] = [],
+  textColor = "#d00",
 ): string {
   const maxLineLength = Math.max(
     20,
@@ -42,7 +43,7 @@ export function createAnalyzerTextSvg(
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`,
     `<rect width="100%" height="100%" fill="#fff" />`,
-    `<text x="${textX}" y="${padding + lineHeight}" fill="#d00" font-family="Menlo, Consolas, monospace" font-size="16">`,
+    `<text x="${textX}" y="${padding + lineHeight}" fill="${textColor}" font-family="Menlo, Consolas, monospace" font-size="16">`,
     ...lines.map(
       (line, index) =>
         `<tspan x="${textX}" dy="${index === 0 ? 0 : lineHeight}">${escapeXml(line)}</tspan>`,

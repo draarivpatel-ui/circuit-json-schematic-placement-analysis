@@ -73,7 +73,14 @@ export function createSchematicPlacementIssueArtifacts(
       [
         // Nest the SVG to preserve its cropped viewBox and clip at the panel edge.
         `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">${svg}</svg>`,
-        createAnalyzerTextSvg(descriptionXml, width),
+        createAnalyzerTextSvg(
+          descriptionXml,
+          width,
+          [],
+          "severity" in issue && issue.severity === "warning"
+            ? "#a16207"
+            : undefined,
+        ),
       ],
       { normalizeSize: false, gap: 0 },
     ).replace(/[ \t]+$/gm, "")

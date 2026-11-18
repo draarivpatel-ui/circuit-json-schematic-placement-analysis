@@ -77,11 +77,12 @@ export class TwoPinComponentRailOrientationSolver extends BaseSolver {
       !nets.some((net) => this.groundNets.has(net))
     )
       return
-    // A diode or fuse between two power rails continues a series power path;
-    // either orientation may match that path, so it is not a vertical shunt branch.
+    // A diode, fuse, or generic chip between two power rails can be drawn
+    // along the series power path in either orientation.
     if (
       (sourceComponent?.ftype === "simple_diode" ||
-        sourceComponent?.ftype === "simple_fuse") &&
+        sourceComponent?.ftype === "simple_fuse" ||
+        sourceComponent?.ftype === "simple_chip") &&
       nets.every((net) => this.powerNets.has(net))
     )
       return

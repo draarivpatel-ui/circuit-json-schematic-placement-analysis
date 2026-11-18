@@ -73,6 +73,7 @@ import { FeedbackNetworkPlacementSolver } from "../FeedbackNetworkPlacementSolve
 import { PullResistorPlacementSolver } from "../PullResistorPlacementSolver/PullResistorPlacementSolver"
 import { SwitchPullResistorPlacementSolver } from "../SwitchPullResistorPlacementSolver/SwitchPullResistorPlacementSolver"
 import { TwoPinComponentRailOrientationSolver } from "../TwoPinComponentRailOrientationSolver/TwoPinComponentRailOrientationSolver"
+import { FuseSymbolSolver } from "../FuseSymbolSolver/FuseSymbolSolver"
 import { SchematicBoxInnerLabelCollisionSolver } from "../SchematicBoxInnerLabelCollisionSolver/SchematicBoxInnerLabelCollisionSolver"
 import { SchematicBoxOverlapSolver } from "../SchematicBoxOverlapSolver/SchematicBoxOverlapSolver"
 import { SchematicBoxTooWideSolver } from "../SchematicBoxTooWideSolver/SchematicBoxTooWideSolver"
@@ -177,6 +178,7 @@ const solversByIssueType = {
   TwoPinComponentCouldBeFlipped: [TwoPinComponentOrientationSolver],
   TwoPinComponentShouldBeVertical: [TwoPinComponentRailOrientationSolver],
   TwoPinComponentHasInvertedRails: [TwoPinComponentRailOrientationSolver],
+  FuseShouldUseSchematicSymbol: [FuseSymbolSolver],
   DecouplingCapacitorsNotCloseTogether: [DecouplingCapacitorGroupingSolver],
   ConnectorPositionCausesTraceDetours: [ConnectorPlacementSolver],
   LowSideTransistorNotAlignedWithLoad: [LowSideTransistorPlacementSolver],
@@ -454,6 +456,13 @@ export class SchematicPlacementPipeline extends BasePipelineSolver<CircuitJson> 
     definePipelineStep(
       "TwoPinComponentRailOrientationSolver",
       TwoPinComponentRailOrientationSolver,
+      (p: SchematicPlacementPipeline): [SolverParams] => [
+        { ctx: p.ctx, issues: p.issues },
+      ],
+    ),
+    definePipelineStep(
+      "FuseSymbolSolver",
+      FuseSymbolSolver,
       (p: SchematicPlacementPipeline): [SolverParams] => [
         { ctx: p.ctx, issues: p.issues },
       ],

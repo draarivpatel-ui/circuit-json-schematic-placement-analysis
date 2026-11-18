@@ -563,6 +563,13 @@ export interface PullResistorOnWrongSide {
   message: string
 }
 
+export interface FuseShouldUseSchematicSymbol {
+  lineItemType: "FuseShouldUseSchematicSymbol"
+  severity: "warning"
+  schematicBox: SchematicBoxPlacement
+  message: string
+}
+
 interface TwoPinComponentRailOrientation {
   schematicBox: SchematicBoxPlacement
   railSourcePortId: string
@@ -1026,6 +1033,7 @@ export type SchematicPlacementIssue =
   | FeedbackNetworkNotCompact
   | PullResistorOnWrongSide
   | TwoPinComponentShouldBeVertical
+  | FuseShouldUseSchematicSymbol
   | TwoPinComponentHasInvertedRails
   | ComponentNetLabelCollision
   | ComponentBoxNetLabelCollision
