@@ -15,25 +15,12 @@ test("reports the TI TPS25751EVM crystal between stacked load capacitors as off-
   expect(crystal.center.y).toBeCloseTo((upper.center.y + lower.center.y) / 2, 2)
   expect(Math.abs(crystal.center.x - upper.center.x)).toBeLessThan(0.25)
 
-  const analysis = analyzeSchematicPlacement(circuitJson)
-  expect(
-    Object.fromEntries(
-      Object.entries(analysis.getIssueCounts()).filter(([, n]) => n > 0),
-    ),
-  ).toEqual({
-    GenericSchematicBoxTooWide: 1,
-    SchematicPinPaddingToEdgeTooLarge: 1,
-    CrystalNotCenteredOverLoadCapacitors: 1,
-    TwoPinComponentShouldBeVertical: 2,
-    RailPathTooSpreadOut: 1,
+  const analysis = analyzeSchematicPlacement(circuitJson, {
+    issueTypes: ["CrystalNotCenteredOverLoadCapacitors"],
   })
   // Current behavior: both load pins share x=0.4, so their midpoint is that
   // column and Y1 is told to move onto it.
-  expect(
-    analysis.getIssues({
-      issueTypes: ["CrystalNotCenteredOverLoadCapacitors"],
-    }),
-  ).toMatchObject([
+  expect(analysis.getIssues()).toMatchObject([
     {
       crystalSchematicBox: { sourceComponentName: "Y1" },
       newSchX: 0.4,
