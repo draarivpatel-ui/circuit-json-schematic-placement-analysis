@@ -136,8 +136,30 @@ export class DiodeResistorAlignmentSolver extends BaseSolver {
       )
     )
       return
+    if (!this.isSeriesPair(diodeCompId, resistorCompId, diodePort)) return
 
     this.checkAlignment(diodeBox, resistorBox, diodePort, resistorPort)
+  }
+
+  /** A drawn wire is a series link only on a private node: not a shared rail,
+   * and not a pair that also shares its other net (parallel parts). */
+  private isSeriesPair(
+    diodeCompId: string,
+    resistorCompId: string,
+    diodePort: SchematicPort,
+  ): boolean {
+    const index = this.network
+    const shared = index.connected(diodePort.source_port_id)
+    if (index.isRail(shared)) return false
+    const diodeNets = index.twoTerminalNets(diodeCompId)
+    const resistorNets = index.twoTerminalNets(resistorCompId)
+    if (
+      diodeNets &&
+      resistorNets &&
+      diodeNets.every((net) => resistorNets.includes(net))
+    )
+      return false
+    return true
   }
 
   private checkAlignment(

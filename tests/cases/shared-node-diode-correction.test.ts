@@ -38,7 +38,7 @@ test("moving only D2 and D5 beside one another preserves the complete power shee
     analysis.schematicIssuesToString(i),
   )
   // D7's crossed branches remain after moving D2 and D5.
-  expect(analysis.getIssues()).toHaveLength(6)
+  expect(analysis.getIssues()).toHaveLength(4)
   for (const issue of analysis.getIssues())
     expect(previousMessages).toContain(analysis.schematicIssuesToString(issue))
   const changed = after.filter(
